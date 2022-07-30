@@ -1,6 +1,6 @@
 function sum(n){
     let sumResult = 0;
-    for (let i=1; i<=n; i++){
+    for (let i = 1; i <= n; i++){
         sumResult = sumResult + i;
     }
     return sumResult;
