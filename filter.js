@@ -27,10 +27,14 @@ let findProduct = products.filter(function (item, index, array) {
 console.log(findProduct);
 //結果得到tv, fan
 
-
-for(let i = 0; i < products.length; i++){
-    if(products[i].price > 100){
-        console.log(products[i].item)
+function filter(products) {
+    let findProduct2 = [];
+    for (let i = 0; i < products.length; i++) {
+        if (products[i].price > 100) {
+            findProduct2.push(products[i]);
+        }
     }
-}
+    return findProduct2;
+};
+console.log(filter(products));
 //結果得到tv, fan
