@@ -20,15 +20,17 @@ let products = [
         status: 'new'
     }
 ];
-let result = products.map((item) => item.itemName);
-console.log(result);
 
 //
 function map(products) {
     let result2 = [];
     for (let i = 0; i < products.length; i++) {
-        result2.push(products[i].itemName);
+        result2.push(products[i].price);
     }
     return result2;
 }
 console.log(map(products));
+
+//原價*0.9
+let result = products.map((item) => item.price * 0.9);
+console.log(result);
