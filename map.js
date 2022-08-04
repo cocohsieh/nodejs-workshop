@@ -30,7 +30,10 @@ function map(products) {
     return result2;
 }
 console.log(map(products));
+//得到結果 [200, 50, 60, 150]
+
 
 //原價*0.9
 let result = products.map((item) => item.price * 0.9);
 console.log(result);
+//得到結果 [180, 45, 54, 135]
