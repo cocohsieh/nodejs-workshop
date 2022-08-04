@@ -1,3 +1,6 @@
+// pritter 排版
+// ESLint 語法檢查
+
 function sum(n){
     let sumResult = 0;
     for (let i = 1; i <= n; i++){
