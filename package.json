@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "axios": "^0.27.2"
+  },
+  "name": "nodejs-workshop",
+  "description": "小專的時候雖然有使用git，但還是很不熟悉。 經過小賴老師的講解及課堂上的練習， 對於git的用法及指令更有印象了。",
+  "version": "1.0.0",
+  "main": "0730-hw-filter.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cocohsieh/nodejs-workshop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cocohsieh/nodejs-workshop/issues"
+  },
+  "homepage": "https://github.com/cocohsieh/nodejs-workshop#readme"
+}
