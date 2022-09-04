@@ -1,37 +1,69 @@
 const express = require('express');
-// 初始化 dotenv
-require('dotenv').config();
 // 利用 express 這個框架/函式庫 來建立一個 web application
 const app = express();
+// 初始化 dotenv
+require('dotenv').config();
+
+const path = require('path');
 
 // 在程式碼中，不要讓某些常數散亂在專案的各處
 // 至少在同一個檔案中，可以放到最上方統一管理
 // 目標是: 只需要改一個地方，全部的地方就生效
 // 降低漏改到的風險 -> 降低程式出錯的風險
-const port = process.env.SERVER_PORT;
+const port = process.env.SERVER_PORT || 3002;
 
-const cors = require('cors');
-app.use(cors());
-
-// 使用資料庫
-const mysql = require('mysql2');
-let pool = mysql
-  .createPool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    // 限制 pool 連線數的上限
-    connectionLimit: 10,
+// 啟用 session
+const expressSession = require('express-session');
+// 把 session 存在硬碟中
+var FileStore = require('session-file-store')(expressSession);
+app.use(
+  expressSession({
+    store: new FileStore({
+      // session 儲存的路徑
+      path: path.join(__dirname, '..', 'sessions'),
+    }),
+    secret: process.env.SESSION_SECRET,
+    // 如果 session 沒有改變的話，要不要重新儲存一次？
+    resave: false,
+    // 還沒初始化的，要不要存
+    saveUninitialized: false,
   })
-  .promise();
+);
+
+// npm i cors
+const cors = require('cors');
+// 使用這個第三方提供的 cors 中間件
+// 來允許跨源存取
+// 預設都是全部開放
+app.use(cors());
+// 使用情境: 當前後端網址不同時，只想允許自己的前端來跨源存取
+//          就可以利用 origin 這個設定來限制，不然預設是 * (全部)
+// const corsOptions = {
+//   origin: ['http://localhost:3000'],
+// };
+// app.use(cors(corsOptions));
+
+// 引用 server 需要的資料庫模組
+const pool = require('./utils/db');
+
+// 如果要讓 express 認得 json
+// Content-Type: application/json
+// 就要加上這個中間件
+app.use(express.json());
 
 // 設定視圖引擎，我們用的是 pug
 // npm i pug
 app.set('view engine', 'pug');
 // 告訴 express 視圖在哪裡
 app.set('views', 'views');
+
+// 設置靜態檔案
+// express.static => 讓靜態檔案可以有網址
+// http://localhost:3002/uploads/檔案名稱
+app.use(express.static(path.join(__dirname, 'public')));
+// 或是給 prefix
+// http://localhost:3002/public/uploads/檔案名稱
+// app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // 測試 server side render 的寫法
 app.get('/ssr', (req, res, next) => {
@@ -79,19 +111,13 @@ app.get('/test', (req, res, next) => {
   // next();
 });
 
-// API
-// 列出所有股票代碼
-// GET /stocks
-app.get('/api/1.0/stocks', async (req, res, next) => {
-  // 寫法1:
-  // let result = await pool.execute('SELECT * FROM stocks');
-  // let data = result[0];
-  // 寫法2:
-  let [data] = await pool.execute('SELECT * FROM stocks');
+let stockRouter = require('./routers/stocks');
+app.use('/api/1.0/stocks', stockRouter);
+// /api/1.0/stocks
+// /api/1.0/stocks/:stockId
 
-  // console.log('result', data);
-  res.json(data);
-});
+let authRouter = require('./routers/auth');
+app.use(authRouter);
 
 // app.get('/test', (req, res, next) => {
 //   console.log('這裡是 test 2');
