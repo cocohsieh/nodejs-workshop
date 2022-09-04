@@ -113,10 +113,10 @@ router.post('/api/1.0/auth/login', async (req, res, next) => {
   // 確認這個 email 有沒有註冊過
   let [members] = await pool.execute('SELECT * FROM members WHERE email = ?', [req.body.email]);
   if (members.length == 0) {
-    // 這個 email 沒有註冊過，就回覆 400
-    // 如果有，回覆 400 跟錯誤訊息
+    // 這個 email 沒有註冊過，就回覆 401
+    // 如果有，回覆 401 跟錯誤訊息
     // members 的長度 == 0 -> 沒有資料 -> 這個 email 沒有註冊過
-    return res.status(400).json({ message: '帳號或密碼錯誤' });
+    return res.status(401).json({ message: '帳號或密碼錯誤' });
   }
   let member = members[0];
   // 有註冊過，就去比密碼
@@ -127,9 +127,18 @@ router.post('/api/1.0/auth/login', async (req, res, next) => {
     return res.status(401).json({ message: '帳號或密碼錯誤' });
   }
 
-  // TODO: 密碼比對成功 -> (1) jwt token (2) session/cookie
-  // TODO: 回覆前端登入成功
-  res.json({});
+  // 密碼比對成功 -> 存在 session
+  let saveMember = {
+    id: member.id,
+    name: member.name,
+    email: member.email,
+    photo: member.photo,
+  };
+  // 把資料寫進 session 裡
+  req.session.member = saveMember;
+
+  // 回覆前端登入成功
+  res.json(saveMember);
 });
 
 module.exports = router;
